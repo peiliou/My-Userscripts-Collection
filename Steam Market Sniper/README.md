@@ -8,8 +8,8 @@ A Steam market web bot that dynamically places/relists order to minimize order c
 * Monitoring support for multiple items
 * Periodically scan listed items for price changes and relist orders accordingly
 * Avoid malicious bidding from other users
-        * The user sets an order price limit for each item (will continue to monitor the item until its price falls below the limit)
-        * Automatically falls back to place an order that is slightly above the second highest order if a high bidding is canceled
+  * The user sets an order price limit for each item (will continue to monitor the item until its price falls below the limit)
+  * Automatically falls back to place an order that is slightly above the second highest order if a high bidding is canceled
 
 ## Usage
 
