@@ -1,4 +1,4 @@
-# Leetcode-Helper
+# Leetcode Helper
 ## Description
 
 Add enhancements to the Leetcode online code editor **(BETA)**

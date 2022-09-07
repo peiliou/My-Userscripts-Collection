@@ -1,4 +1,4 @@
-# Steam-Market-Sniper
+# Steam Market Sniper
 ## Description
 
 A Steam market web bot that dynamically places/relists order to minimize order cost while maximizing order priority
