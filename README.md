@@ -8,4 +8,4 @@ A collection of userscripts I wrote in my spare time to automate workflows and i
 
 2. Navigate to a directory of this repo to view details of an userscript
 
-3. To install this userscript, navigate to the file `userscript.user.js` and click the `raw` button
+3. To install this userscript, navigate to the file `Userscript.user.js` and click the `Raw` button
