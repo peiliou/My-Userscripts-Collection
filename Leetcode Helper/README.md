@@ -5,10 +5,12 @@ Add enhancements to the Leetcode online code editor **(BETA)**
 
 ## Features
 
+* Select Python3 by default (can change it to any other programming language in Userscript)
 * Automatic retries for free-tier account code submissions
 * Integrate language formaters into the code editor
   * Currently supported languages
     * Go
+    * Python
 
 ## Usage
 
@@ -16,4 +18,4 @@ Add enhancements to the Leetcode online code editor **(BETA)**
 
 ## Last updated
 
-8/15/2022
+10/2/2022

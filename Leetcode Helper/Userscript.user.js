@@ -8,12 +8,13 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=leetcode.com
 // @grant        GM_xmlhttpRequest
 // @connect      go.dev
+// @connect      formatter.org
 // ==/UserScript==
 
 (function() {
         'use strict';
         let timer,id,lang;
-        localStorage.global_lang='"golang"';
+        localStorage.global_lang='"python3"';
     
         const init=()=>{
             timer=(
@@ -47,18 +48,18 @@
     
         const format=async()=>{
             let buffer,table,lang=localStorage.global_lang.replaceAll('"','');
-            const key=document.querySelector('div[class*="pagination-screen"]>span') .innerText.split('/')[0]+id+lang;
-            const code=localStorage.getItem(key);
-            switch(localStorage.global_lang){
+            const key=document.querySelector('div[class*="pagination-screen"]>span') .innerText.split('/')[0]+id;
+            const code=localStorage.getItem(key+lang);
+            const current_lang=localStorage.getItem(key+'lang')||localStorage.global_lang;
+    
+            switch(current_lang){
                 case '"golang"':
-                    //buffer=("package main\\n\\n"+code.substring(1,code.length-1)).replace(/([^\s-]) ([^\s-])/gm,'$1+$2');
                     table = {'%20':'+','%5Cn':'%0A','%5Ct':'++++','%5C%22':'%22'};
                     buffer=encodeURIComponent("package main\\n\\n"+code.substring(1,code.length-1)).replace(/%20|%5Cn|%5Ct|%5C%22/g, key=>table[key]);
-                    console.log(buffer);
-                    buffer=await parse_data(buffer);
+                    buffer=await parse_data("https://go.dev/_/fmt?backend=",{"Origin":"https://go.dev","Referer":"https://go.dev/play/"},'body='+buffer);
     
                     if(buffer.Error==0){
-                        localStorage.setItem(key,buffer.Body.substring(14));
+                        localStorage.setItem(key+lang,buffer.Body.substring(14));
                         location.reload();
                     }else{
                         alert(
@@ -69,29 +70,44 @@
                     }
     
                     break;
+                case '"python3"':
+                case '"python"':
+                    table = {'\\n':'\n'};
+                    buffer=code.substring(1,code.length-1).replace(/\\n/g, key=>table[key]);
+                    buffer=await parse_data("https://formatter.org/admin/python-format",{"Origin":"https://formatter.org","Referer":"https://formatter.org/python-formatter"},JSON.stringify({"codeSrc":buffer}));
+    
+                    if(buffer.errcode==0){
+                        localStorage.setItem(key+lang,buffer.codeDst);
+                        location.reload();
+                    }else{
+                        alert(
+                            buffer.codeDst
+                        );
+                    }
+                    break;
+                default:
+    
+                    break;
             }
         }
     
-        const get_api_url=()=>{
-            return "https://go.dev/_/fmt?backend=";
-        }
     
-        const parse_data=data=>{
+        const parse_data=(url,header,data)=>{
             return new Promise(resolve=>{
                 GM_xmlhttpRequest({
                     method: "POST",
-                    url: get_api_url(),
+                    url: url,
                     headers: {
                         "Content-type":"application/x-www-form-urlencoded; charset=UTF-8",
                         "Accept-Encoding":"gzip, deflate, br",
-                        "Origin":"https://go.dev",
-                        "Referer":"https://go.dev/play/",
                         "Sec-Fetch-Dest":"empty",
                         "Sec-Fetch-Mode":"cors",
                         "Sec-Fetch-Site":"same-origin",
+                        ...header,
                     },
-                    data:'body='+data,
+                    data:data,
                     onload: function(response) {
+                        //console.log(response);
                         if (response.status >= 200 && response.status < 400) {
                             resolve(JSON.parse(response.responseText));
                         } else{
