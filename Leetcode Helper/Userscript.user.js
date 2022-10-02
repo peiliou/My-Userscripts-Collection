@@ -73,8 +73,8 @@
 				break;
 			case '"python3"':
 			case '"python"':
-				table = { '\\n': '\n' };
-				buffer = code.substring(1, code.length - 1).replace(/\\n/g, key => table[key]);
+				table = { '\\n': '\n', '\\\"': '\"' };
+				buffer = code.substring(1, code.length - 1).replace(/\\n|\\\"/g, key => table[key]);
 				buffer = await parse_data("https://formatter.org/admin/python-format", { "Origin": "https://formatter.org", "Referer": "https://formatter.org/python-formatter" }, JSON.stringify({ "codeSrc": buffer }));
 
 				if (buffer.errcode == 0) {
