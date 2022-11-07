@@ -25,8 +25,10 @@
 					for (let key in localStorage) {
 						if (parseInt(key) > 0) {
 							const tmp = key.split("_");
-							id = "_" + tmp[1] + "_";
-							break;
+							if (parseInt(tmp[1]) > 0) {
+								id = "_" + tmp[1] + "_";
+								break;
+							}
 						}
 					}
 					console.log(id);
