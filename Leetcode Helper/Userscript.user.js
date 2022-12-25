@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LeetCode Helper
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.1.0
 // @description  try to take over the world!
 // @author       Pei
 // @match        https://leetcode.com/problems/*
@@ -13,56 +13,58 @@
 
 (function () {
 	'use strict';
-	let timer, id, lang;
+	let timer, id, lang, metadata;
 	localStorage.global_lang = '"python3"';
 
 	const init = () => {
 		timer = (
 			setInterval(() => {
-				const elem = document.querySelector('div[class*="error_"]');
-				const btns = document.querySelector('div[class*="btns"]');
-				if (btns.childElementCount == 5) {
+				const elem = document.querySelector("." + CSS.escape("dark:text-dark-red-4"));
+				const btns = document.querySelector("#editor").children[2].children[1].children[0].children;
+				if (btns.length == 6) {
 					for (let key in localStorage) {
 						if (parseInt(key) > 0) {
 							const tmp = key.split("_");
-							if (parseInt(tmp[1]) > 0) {
-								id = "_" + tmp[1] + "_";
-								break;
-							}
+							id = "_" + tmp[1] + "_";
+							metadata = __NEXT_DATA__.props.pageProps.dehydratedState.queries[0].state.data;
+							break;
 						}
 					}
 					console.log(id);
 
 					const new_btn = document.createElement('button');
+					new_btn.className = 'rounded px-3 py-1.5 font-medium items-center whitespace-nowrap transition-all focus:outline-none inline-flex hover:bg-fill-3 dark:hover:bg-dark-fill-3 ml-auto !p-1';
 					new_btn.innerText = 'format';
 					new_btn.onclick = format;
-					btns.append(new_btn);
+					btns[0].before(new_btn);
 				}
 
 				if (elem) {
-					const key_word = elem.innerText.split(" ")[4];
-					const button = Array.from(document.querySelectorAll('button>span')).find(el => el.textContent.toLowerCase().includes(key_word)).parentElement;
-					button.click();
+					const key_word = "run";
+					const submit_button = Array.from(document.querySelectorAll('button')).find(el => el.textContent.toLowerCase().includes(key_word));
+					if (submit_button) {
+						submit_button.click();
+					}
 				}
 			}, 1000)
 		);
 	}
 
 	const format = async () => {
-		let buffer, table, lang = localStorage.global_lang.replaceAll('"', '');
-		const key = document.querySelector('div[class*="pagination-screen"]>span').innerText.split('/')[0] + id;
-		const code = localStorage.getItem(key + lang);
-		const current_lang = localStorage.getItem(key + 'lang') || localStorage.global_lang;
-		//console.log(current_lang);
+		let buffer, table, lang = localStorage.global_lang;
+		const key = metadata.question.questionId + id;
+		let current_lang = localStorage.getItem(key + 'lang') || lang;
+		current_lang = current_lang.replaceAll('"', '');
+		const code = localStorage.getItem(key + current_lang);
 
 		switch (current_lang) {
-			case '"golang"':
+			case 'golang':
 				table = { '%20': '+', '%5Cn': '%0A', '%5Ct': '++++', '%5C%22': '%22' };
 				buffer = encodeURIComponent("package main\\n\\n" + code.substring(1, code.length - 1)).replace(/%20|%5Cn|%5Ct|%5C%22/g, key => table[key]);
 				buffer = await parse_data("https://go.dev/_/fmt?backend=", { "Origin": "https://go.dev", "Referer": "https://go.dev/play/" }, 'body=' + buffer);
 
 				if (buffer.Error == 0) {
-					localStorage.setItem(key + lang, buffer.Body.substring(14));
+					localStorage.setItem(key + current_lang, buffer.Body.substring(14));
 					location.reload();
 				} else {
 					alert(
@@ -73,8 +75,8 @@
 				}
 
 				break;
-			case '"python3"':
-			case '"python"':
+			case 'python3':
+			case 'python':
 				table = { '\\n': '\n', '\\\"': '\"' };
 				buffer = code.substring(1, code.length - 1).replace(/\\n|\\\"/g, key => table[key]);
 				buffer = await parse_data("https://formatter.org/admin/python-format", { "Origin": "https://formatter.org", "Referer": "https://formatter.org/python-formatter" }, JSON.stringify({ "codeSrc": buffer }));
@@ -85,7 +87,7 @@
 							buffer.codeDst
 						);
 					} else {
-						localStorage.setItem(key + lang, buffer.codeDst);
+						localStorage.setItem(key + current_lang, buffer.codeDst);
 						location.reload();
 					}
 				}

@@ -9,8 +9,9 @@ Add enhancements to the Leetcode online code editor **(BETA)**
 * Automatic retries for free-tier account code submissions
 * Integrate language formaters into the code editor
   * Currently supported languages
-    * Go
+    * Python3
     * Python
+    * Go
 
 ## Usage
 
@@ -18,4 +19,4 @@ Add enhancements to the Leetcode online code editor **(BETA)**
 
 ## Last updated
 
-11/7/2022
+12/25/2022
